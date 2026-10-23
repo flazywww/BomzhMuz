@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BomzhMuz</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d11;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    .disc {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #e0245e 22%, #1a1a24 23%, #000 70%);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.8);
+      margin-bottom: 30px;
+      animation: spin 7s linear infinite;
+      animation-play-state: paused;
+    }
+    .disc.active { animation-play-state: running; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    h2 { font-size: 22px; margin-bottom: 6px; }
+    p { font-size: 14px; color: #8e8e93; margin-bottom: 30px; }
+    .controls { display: flex; gap: 24px; align-items: center; }
+    .btn {
+      background: #1e1e24;
+      color: #fff;
+      border: none;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .btn.play {
+      background: #2481cc;
+      width: 70px;
+      height: 70px;
+      font-size: 28px;
+    }
+  </style>
+</head>
+<body>
+  <div class="disc" id="disc"></div>
+  <h2 id="title">Night Drive</h2>
+  <p id="artist">Lo-Fi Synth</p>
+
+  <div class="controls">
+    <button class="btn" onclick="prev()">⏮</button>
+    <button class="btn play" id="playBtn" onclick="toggle()">▶</button>
+    <button class="btn" onclick="next()">⏭</button>
+  </div>
+
+  <audio id="audio"></audio>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
+
+    const playlist = [
+      { title: "Night Drive", artist: "Lo-Fi Synth", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+      { title: "Tokyo Drift Vibe", artist: "Chill Beats", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+      { title: "Cyber Sunset", artist: "Electro Vibe", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+    ];
+
+    let i = 0;
+    const audio = document.getElementById('audio');
+    const disc = document.getElementById('disc');
+    const btn = document.getElementById('playBtn');
+    const title = document.getElementById('title');
+    const artist = document.getElementById('artist');
+
+    function load(idx) {
+      audio.src = playlist[idx].url;
+      title.innerText = playlist[idx].title;
+      artist.innerText = playlist[idx].artist;
+    }
+    load(i);
+
+    function toggle() {
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+      if (audio.paused) {
+        audio.play();
+        btn.innerText = '⏸';
+        disc.classList.add('active');
+      } else {
+        audio.pause();
+        btn.innerText = '▶';
+        disc.classList.remove('active');
+      }
+    }
+
+    function next() {
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      i = (i + 1) % playlist.length;
+      load(i);
+      audio.play();
+      btn.innerText = '⏸';
+      disc.classList.add('active');
+    }
+
+    function prev() {
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+      i = (i - 1 + playlist.length) % playlist.length;
+      load(i);
+      audio.play();
+      btn.innerText = '⏸';
+      disc.classList.add('active');
+    }
+  </script>
+</body>
+</html>
